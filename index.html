@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A Ruby Promise For Aamina • June 25</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Poppins"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Shifting Velvet Crimson Background */
+        @keyframes auroraShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        body {
+            background: linear-gradient(-45deg, #090103, #2a030d, #58081a, #110104);
+            background-size: 400% 400%;
+            animation: auroraShift 15s ease infinite;
+        }
+
+        /* Floating particles animation */
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) scale(0) rotate(0deg); opacity: 0; }
+            30% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1) rotate(360deg); opacity: 0; }
+        }
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatUp 8s infinite linear;
+        }
+
+        /* Card Shimmer Sweep Effect */
+        @keyframes sweep {
+            0% { left: -100%; }
+            50%, 100% { left: 120%; }
+        }
+        .shimmer-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+            transform: skewX(-20deg);
+            animation: sweep 6s infinite ease-in-out;
+        }
+
+        /* Staggered Cascade Entrance Animation */
+        @keyframes cascadeUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .cascade-item {
+            opacity: 0;
+            animation: cascadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+
+        .page-transition {
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .lyric-line {
+            transition: all 0.5s ease;
+        }
+        .lyric-active {
+            color: #ef4444; /* red-500 */
+            transform: scale(1.05);
+            font-weight: 600;
+            opacity: 1 !important;
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+        }
+        .lyric-inactive {
+            opacity: 0.25;
+        }
+
+        /* Interactive flower petal settings */
+        .petal {
+            transform-origin: bottom center;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .petal-active {
+            fill: #dc2626 !important; /* red-600 */
+            filter: drop-shadow(0 0 12px rgba(220, 38, 38, 0.6));
+        }
+
+        /* Custom Scrollbar for Aamina's Letter */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(220, 38, 38, 0.3);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(220, 38, 38, 0.6);
+            border-radius: 10px;
+        }
+
+        /* Floating Balloon Styles */
+        @keyframes sway {
+            0%, 100% { transform: translateY(0) rotate(3deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+        }
+        .balloon-element {
+            animation: sway 4s infinite ease-in-out;
+            transition: all 0.4s ease;
+        }
+        .balloon-popped {
+            transform: scale(0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Pulsing Candle Flame Animation */
+        @keyframes pulseFlame {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.15) translateY(-2px); opacity: 1; }
+        }
+        .candle-flame {
+            animation: pulseFlame 1.2s infinite ease-in-out;
+            transition: all 0.3s ease;
+        }
+
+        /* Smoke on candle blow */
+        @keyframes floatSmoke {
+            0% { transform: translateY(0) scale(0.8); opacity: 0.5; }
+            100% { transform: translateY(-30px) scale(1.5); opacity: 0; }
+        }
+        .smoke-wisp {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            filter: blur(4px);
+            pointer-events: none;
+            animation: floatSmoke 1s forwards ease-out;
+        }
+
+        /* 3D Polaroid Flip Style */
+        .polaroid-3d {
+            perspective: 1000px;
+        }
+        .polaroid-inner {
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .polaroid-flipped {
+            transform: rotateY(180deg);
+        }
+        .polaroid-front, .polaroid-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+        .polaroid-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Lock Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.35s ease-in-out;
+            border-color: rgba(220, 38, 38, 0.6) !important;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between font-sans overflow-x-hidden relative text-slate-100 select-none">
+
+    <!-- Glowing Progress Bar at the very top of the body -->
+    <div class="fixed top-0 left-0 right-0 h-1 bg-slate-900/60 z-50">
+        <div id="global-progress" class="h-full bg-gradient-to-r from-red-500 to-rose-500 shadow-[0_0_10px_rgba(239,68,68,0.5)] transition-all duration-500" style="width: 9%;"></div>
+    </div>
+
+    <!-- Interactive Magic Sparkles & Explosion Canvas Layer -->
+    <canvas id="magic-sparkle-canvas" class="fixed inset-0 pointer-events-none z-40"></canvas>
+
+    <!-- Floating Ruby Hearts & Warm Stars -->
+    <div id="particles-container" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- Background Audio for Countdown Page (Page 1) -->
+    <audio id="bg-music-countdown" src="/home/aswingk/Documents/sample/teddy_en_nanbiye.mp3" loop></audio>
+
+    <!-- Background Audio for Main Experience (Kadhaippoma) -->
+    <audio id="bg-music" src="/home/aswingk/Documents/sample/Kadhaippoma.mp3" loop></audio>
+
+    <!-- Floating Audio Control Widget -->
+    <div id="music-widget" class="fixed top-4 right-4 z-50 hidden">
+        <button id="music-toggle" class="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-3 rounded-full shadow-2xl text-red-500 hover:scale-115 transition-all focus:outline-none">
+            <svg id="music-on-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <svg id="music-off-icon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 10l12-3M5 19a3 3 0 11-6 0 3 3 0 016 0zm14-2a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+    </div>
+
+    <!-- ================= TEST MODE INDICATOR BADGE ================= -->
+    <div id="test-mode-badge" class="fixed top-4 left-4 z-50 hidden bg-gradient-to-r from-red-500 to-rose-500 text-white font-semibold text-[10px] px-3.5 py-1.5 rounded-full shadow-lg border border-red-400/20 select-none animate-pulse">
+        🧪 Test Mode Enabled (Bypassed)
+    </div>
+
+    <!-- ================= MIDNIGHT CELEBRATION SCREEN ================= -->
+    <div id="celebration-overlay" class="fixed inset-0 bg-slate-950 z-50 flex flex-col items-center justify-center hidden opacity-0 transition-opacity duration-1000">
+        <canvas id="fireworks-canvas" class="absolute inset-0 pointer-events-none z-0"></canvas>
+        <div class="relative z-10 text-center px-6">
+            <span class="text-xs font-semibold tracking-widest text-red-400 uppercase mb-4 block animate-bounce">The Clock Strikes Twelve</span>
+            <h1 class="text-5xl md:text-6xl font-serif font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-200 drop-shadow-2xl">
+                HAPPY BIRTHDAY, AAMINA!
+            </h1>
+            <p class="text-slate-300 mt-4 max-w-sm mx-auto text-sm font-light">The wait is over. Your special milestone has officially arrived.</p>
+            <button id="proceed-from-celebration" class="mt-8 bg-gradient-to-r from-red-500 to-rose-500 text-slate-950 font-bold py-3.5 px-10 rounded-full shadow-lg shadow-red-500/20 hover:scale-105 transition-all">
+                Enter Your Surprise
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="relative z-10 w-full max-w-2xl px-4 py-8 flex flex-col items-center justify-center flex-grow">
+
+        <!-- ================= PAGE 1: COUNTDOWN & LOCKED CLUES ================= -->
+        <section id="page-1" class="page-transition w-full flex flex-col items-center text-center">
+            <header class="mb-8 cascade-item">
+                <span class="text-xs font-extrabold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">A Shared Secret</span>
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white mt-4 tracking-tight drop-shadow">Waiting for Aamina's Day</h1>
+                <p class="text-slate-400 mt-2 text-sm font-light">Something beautiful is waiting at the stroke of midnight on June 25th.</p>
+            </header>
+
+            <!-- Sound Prompt Widget (Page 1 Specific) -->
+            <div id="sound-prompt-container" class="mb-6 cascade-item delay-100">
+                <button id="sound-prompt-btn" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold py-2 px-6 rounded-full text-xs flex items-center gap-2 transition-all shadow-md animate-pulse">
+                    <span id="sound-prompt-icon">🔊</span> <span id="sound-prompt-text">Tap to Play Countdown Music</span>
+                </button>
+            </div>
+
+            <!-- Ruby Styled Countdown Clock -->
+            <div class="w-full bg-slate-900/40 backdrop-blur-md rounded-3xl p-6 md:p-8 shadow-2xl border border-slate-800 mb-10 shimmer-card cascade-item delay-100">
+                <div class="grid grid-cols-4 gap-2 md:gap-4">
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 shadow-inner">
+                        <span id="days" class="block text-3xl md:text-4xl font-serif font-bold text-red-500">00</span>
+                        <span class="text-[9px] tracking-widest text-slate-500 uppercase font-bold">Days</span>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 shadow-inner">
+                        <span id="hours" class="block text-3xl md:text-4xl font-serif font-bold text-red-500">00</span>
+                        <span class="text-[9px] tracking-widest text-slate-500 uppercase font-bold">Hours</span>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 shadow-inner">
+                        <span id="minutes" class="block text-3xl md:text-4xl font-serif font-bold text-red-500">00</span>
+                        <span class="text-[9px] tracking-widest text-slate-500 uppercase font-bold">Mins</span>
+                    </div>
+                    <div class="bg-slate-950/60 rounded-2xl p-4 border border-slate-800/80 shadow-inner">
+                        <span id="seconds" class="block text-3xl md:text-4xl font-serif font-bold text-red-500">00</span>
+                        <span class="text-[9px] tracking-widest text-slate-500 uppercase font-bold">Secs</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completely Hidden Decryption Clues -->
+            <div class="w-full mb-10 cascade-item delay-200">
+                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-4">Click below to decrypt clue</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <!-- Card 1 -->
+                    <div onclick="revealClue(this)" class="bg-slate-950/40 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all duration-300 flex flex-col items-center justify-center min-h-[110px] shadow-lg relative overflow-hidden group">
+                        <div class="clue-placeholder flex flex-col items-center transition-all duration-300 group-hover:scale-105">
+                            <span class="text-2xl text-red-500 animate-pulse">🔑</span>
+                            <span class="text-[9px] mt-2 font-bold tracking-widest uppercase text-slate-500">Decrypt</span>
+                        </div>
+                        <p class="clue-text hidden opacity-0 transition-opacity duration-700 text-[11px] text-slate-300 font-serif italic leading-relaxed text-center">
+                            "The VIP of my universe."
+                        </p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div onclick="revealClue(this)" class="bg-slate-950/40 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all duration-300 flex flex-col items-center justify-center min-h-[110px] shadow-lg relative overflow-hidden group">
+                        <div class="clue-placeholder flex flex-col items-center transition-all duration-300 group-hover:scale-105">
+                            <span class="text-2xl text-rose-500 animate-pulse">🔑</span>
+                            <span class="text-[9px] mt-2 font-bold tracking-widest uppercase text-slate-500">Decrypt</span>
+                        </div>
+                        <p class="clue-text hidden opacity-0 transition-opacity duration-700 text-[11px] text-slate-300 font-serif italic leading-relaxed text-center">
+                            "A connection we promised to protect."
+                        </p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div onclick="revealClue(this)" class="bg-slate-950/40 border border-slate-800 p-4 rounded-2xl cursor-pointer hover:border-red-500/40 transition-all duration-300 flex flex-col items-center justify-center min-h-[110px] shadow-lg relative overflow-hidden group">
+                        <div class="clue-placeholder flex flex-col items-center transition-all duration-300 group-hover:scale-105">
+                            <span class="text-2xl text-amber-400 animate-pulse">🔑</span>
+                            <span class="text-[9px] mt-2 font-bold tracking-widest uppercase text-slate-500">Decrypt</span>
+                        </div>
+                        <p class="clue-text hidden opacity-0 transition-opacity duration-700 text-[11px] text-slate-300 font-serif italic leading-relaxed text-center">
+                            "Celebrating the best human on June 25."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Lock Interface Wrapper -->
+            <div id="lock-container" class="w-full flex flex-col items-center cascade-item delay-300">
+                <!-- Lock Label -->
+                <div id="locked-notice" class="bg-slate-900/60 border border-slate-800 rounded-full py-3 px-8 shadow-inner flex items-center gap-2 text-slate-400 font-semibold text-xs select-none tracking-wider">
+                    <span class="animate-pulse">🔒</span> Unlocks on June 25th at Midnight
+                </div>
+
+                <!-- Unlocked Link Trigger -->
+                <button id="to-page-2-btn" class="hidden bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-700 hover:to-rose-600 text-white font-bold py-3.5 px-10 rounded-full shadow-lg shadow-red-500/10 hover:scale-105 transition-all duration-300">
+                    Continue the Journey
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= PAGE 2: THE SVG FLOWER ================= -->
+        <section id="page-2" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Inner Qualities</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Your Best Traits</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Tap each petal of the flower to reveal her traits.</p>
+            </header>
+
+            <div class="relative w-64 h-64 flex items-center justify-center mb-6 cascade-item delay-100">
+                <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow-[0_0_15px_rgba(220,38,38,0.15)]">
+                    <path onclick="clickPetal(this, 'Kindness')" class="petal cursor-pointer" fill="#f87171" opacity="0.3" d="M50,50 C40,25 35,5 50,5 C65,5 60,25 50,50 Z" />
+                    <path onclick="clickPetal(this, 'Her Smile')" class="petal cursor-pointer" fill="#f87171" opacity="0.3" d="M50,50 C75,40 95,35 95,50 C95,65 75,60 50,50 Z" />
+                    <path onclick="clickPetal(this, 'Unyielding Support')" class="petal cursor-pointer" fill="#f87171" opacity="0.3" d="M50,50 C60,75 65,95 50,95 C35,95 40,75 50,50 Z" />
+                    <path onclick="clickPetal(this, 'Warmth')" class="petal cursor-pointer" fill="#f87171" opacity="0.3" d="M50,50 C25,60 5,65 5,50 C5,35 25,40 50,50 Z" />
+                    <circle cx="50" cy="50" r="10" fill="#fbbf24" />
+                </svg>
+                <div id="petal-display" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span class="text-[10px] font-bold text-slate-300 mt-28 bg-slate-900/90 px-4 py-1.5 rounded-full border border-slate-800 shadow-lg tracking-widest uppercase">Tap Petals</span>
+                </div>
+            </div>
+
+            <p id="petal-counter" class="text-xs text-slate-400 mb-8 font-semibold tracking-wide cascade-item delay-200">Revealed: 0 / 4 qualities</p>
+
+            <button id="to-page-3-btn" class="opacity-50 pointer-events-none bg-slate-900 text-slate-600 border border-slate-800 font-bold py-3.5 px-10 rounded-full transition-all duration-300 cascade-item delay-300">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 3: FRIENDSHIP DICTIONARY (POETIC DEFINITIONS) ================= -->
+        <section id="page-3" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Words That Define Us</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">The Friendship Glossary</h1>
+                <p class="text-slate-400 text-xs mt-1">Poetic truths that represent our unbreakable bond.</p>
+            </header>
+
+            <div class="space-y-4 w-full max-w-md mb-8 cascade-item delay-100">
+                <!-- Anam Cara Card -->
+                <div class="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/80 text-left hover:border-red-500/20 transition-all duration-300 shadow-md hover:-translate-y-1">
+                    <span class="text-[10px] font-semibold tracking-widest text-red-400 uppercase">Anam Cara</span>
+                    <h3 class="text-base font-serif font-bold text-white mt-0.5">Soul Friend</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 leading-relaxed font-light">A rare Gaelic bond. A promise that no matter where life leads, our souls speak a silent language, guaranteeing we will always remain close.</p>
+                </div>
+                <!-- Non-Stranger Vow Card -->
+                <div class="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/80 text-left hover:border-rose-500/20 transition-all duration-300 shadow-md hover:-translate-y-1">
+                    <span class="text-[10px] font-semibold tracking-widest text-rose-400 uppercase">The Promise Vow</span>
+                    <h3 class="text-base font-serif font-bold text-white mt-0.5">Friends Forever</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 leading-relaxed font-light">A shared understanding that time, silence, and distance hold no power over us, refusing to let the passing years turn us into strangers again.</p>
+                </div>
+                <!-- Sisu Card -->
+                <div class="bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/80 text-left hover:border-amber-500/20 transition-all duration-300 shadow-md hover:-translate-y-1">
+                    <span class="text-[10px] font-semibold tracking-widest text-amber-400 uppercase">Unbroken Sisu</span>
+                    <h3 class="text-base font-serif font-bold text-white mt-0.5">Unbreakable Resilience</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 leading-relaxed font-light">A Finnish concept applied to connection. A fierce, silent strength that survives any storm or distance, keeping our dynamic completely intact.</p>
+                </div>
+            </div>
+
+            <button id="to-page-4-btn" class="bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold py-3.5 px-10 rounded-full shadow hover:scale-105 transition-all duration-300 cascade-item delay-200">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 4: THE WISHING WELL ================= -->
+        <section id="page-4" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">The Wishing Well</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Cosmic Wishes</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Click on each glowing orb to send a wish out into the universe.</p>
+            </header>
+
+            <div class="grid grid-cols-2 gap-4 w-full max-w-sm mb-8 cascade-item delay-100">
+                <div onclick="revealWish(this, 'Peace of Mind')" class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-red-500/30 transition-all duration-300 flex flex-col items-center justify-center min-h-[90px] hover:-translate-y-1">
+                    <span class="wish-icon text-2xl filter drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">✨</span>
+                    <span class="wish-text hidden text-xs font-bold text-red-400 tracking-wider">Peace of Mind</span>
+                </div>
+                <div onclick="revealWish(this, 'Endless Laughter')" class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-rose-500/30 transition-all duration-300 flex flex-col items-center justify-center min-h-[90px] hover:-translate-y-1">
+                    <span class="wish-icon text-2xl filter drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]">💖</span>
+                    <span class="wish-text hidden text-xs font-bold text-rose-400 tracking-wider">Endless Laughter</span>
+                </div>
+                <div onclick="revealWish(this, 'Unstoppable Success')" class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-amber-500/30 transition-all duration-300 flex flex-col items-center justify-center min-h-[90px] hover:-translate-y-1">
+                    <span class="wish-icon text-2xl filter drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]">🌟</span>
+                    <span class="wish-text hidden text-xs font-bold text-amber-500 tracking-wider">Unstoppable Success</span>
+                </div>
+                <div onclick="revealWish(this, 'Deep Protection')" class="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl cursor-pointer hover:border-emerald-500/30 transition-all duration-300 flex flex-col items-center justify-center min-h-[90px] hover:-translate-y-1">
+                    <span class="wish-icon text-2xl filter drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">🛡️</span>
+                    <span class="wish-text hidden text-xs font-bold text-emerald-400 tracking-wider">Deep Protection</span>
+                </div>
+            </div>
+
+            <p id="wish-counter" class="text-xs text-slate-400 mb-8 font-semibold tracking-wide cascade-item delay-200">Wishes Sent: 0 / 4</p>
+
+            <button id="to-page-5-btn" class="opacity-50 pointer-events-none bg-slate-900 text-slate-600 border border-slate-800 font-bold py-3.5 px-10 rounded-full transition-all duration-300 cascade-item delay-300">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 5: THE BALLOON POP ================= -->
+        <section id="page-5" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Interactive Game</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Pop the Balloons</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Pop each floating balloon to reveal the letters of your name.</p>
+            </header>
+
+            <div class="grid grid-cols-3 gap-4 w-full max-w-sm mb-8 relative z-10 cascade-item delay-100">
+                <!-- Balloon 1 -->
+                <div onclick="popBalloon(this, 'A')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+                <!-- Balloon 2 -->
+                <div onclick="popBalloon(this, 'A')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+                <!-- Balloon 3 -->
+                <div onclick="popBalloon(this, 'M')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+                <!-- Balloon 4 -->
+                <div onclick="popBalloon(this, 'I')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+                <!-- Balloon 5 -->
+                <div onclick="popBalloon(this, 'N')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+                <!-- Balloon 6 -->
+                <div onclick="popBalloon(this, 'A')" class="balloon-element bg-gradient-to-b from-red-500 to-rose-600 border border-rose-400/20 shadow-lg rounded-full w-20 h-24 flex items-center justify-center cursor-pointer select-none mx-auto transform hover:scale-105 active:scale-95 transition-all">
+                    <span class="balloon-label text-white font-bold text-lg">🎈</span>
+                </div>
+            </div>
+
+            <div class="mb-8 cascade-item delay-200">
+                <span class="text-xs text-slate-500 block mb-2 uppercase tracking-wider font-semibold">Decrypted Name:</span>
+                <span id="balloon-word-assembly" class="text-2xl font-serif font-extrabold text-red-400 tracking-widest min-h-[36px] inline-block">—</span>
+            </div>
+
+            <button id="to-page-6-btn" class="opacity-50 pointer-events-none bg-slate-900 text-slate-600 border border-slate-800 font-bold py-3.5 px-10 rounded-full transition-all duration-300 cascade-item delay-300">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 6: THE CONSTELLATION MAP ================= -->
+        <section id="page-6" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Interactive Mapping</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Constellation Connect</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Tap the 3 glowing stars sequentially to connect our stellar alignment.</p>
+            </header>
+
+            <div class="relative w-72 h-64 border border-slate-800/60 rounded-3xl bg-slate-950/60 overflow-hidden mb-8 shadow-inner cascade-item delay-100">
+                <svg id="constellation-svg" class="absolute inset-0 w-full h-full z-10">
+                    <!-- Dynamic Connecting Lines -->
+                    <line id="star-line-1" x1="40" y1="180" x2="144" y2="70" stroke="#f43f5e" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="100" class="transition-all duration-1000" />
+                    <line id="star-line-2" x1="144" y1="70" x2="248" y2="180" stroke="#f43f5e" stroke-width="2" stroke-dasharray="100" stroke-dashoffset="100" class="transition-all duration-1000" />
+                    <line id="star-line-3" x1="248" y1="180" x2="40" y2="180" stroke="#f43f5e" stroke-width="2" stroke-dasharray="300" stroke-dashoffset="300" class="transition-all duration-1000" />
+                </svg>
+
+                <!-- Hidden Heart & Name -->
+                <div id="constellation-heart" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-0 transition-opacity duration-1000 z-20">
+                    <svg class="w-24 h-24 text-red-500/30 fill-current animate-pulse" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span class="absolute text-sm font-serif font-bold text-white tracking-widest uppercase">Aamina</span>
+                </div>
+
+                <!-- Star Buttons -->
+                <button onclick="connectStar(this, 1)" class="absolute left-6 bottom-10 bg-slate-900 border border-slate-700 w-8 h-8 rounded-full flex items-center justify-center text-xs text-amber-400 z-30 shadow hover:border-amber-400/40 focus:outline-none transition-all">⭐</button>
+                <button onclick="connectStar(this, 2)" class="absolute left-1/2 -translate-x-1/2 top-10 bg-slate-900 border border-slate-700 w-8 h-8 rounded-full flex items-center justify-center text-xs text-amber-400 z-30 shadow hover:border-amber-400/40 focus:outline-none transition-all">⭐</button>
+                <button onclick="connectStar(this, 3)" class="absolute right-6 bottom-10 bg-slate-900 border border-slate-700 w-8 h-8 rounded-full flex items-center justify-center text-xs text-amber-400 z-30 shadow hover:border-amber-400/40 focus:outline-none transition-all">⭐</button>
+            </div>
+
+            <p id="star-status-msg" class="text-xs text-slate-500 mb-8 font-light uppercase tracking-widest cascade-item delay-200">Connect: 0 / 3 alignments</p>
+
+            <button id="to-page-7-btn" class="opacity-50 pointer-events-none bg-slate-900 text-slate-600 border border-slate-800 font-bold py-3.5 px-10 rounded-full transition-all duration-300 cascade-item delay-300">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 7: VIRTUAL PINKY PROMISE ================= -->
+        <section id="page-7" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Our Eternal Vow</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">The Pinky Promise</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Tap the virtual seal to lock in our promise to never become strangers, Aamina.</p>
+            </header>
+
+            <div class="flex flex-col items-center justify-center mb-8 relative cascade-item delay-100">
+                <button id="promise-seal-btn" class="w-32 h-32 rounded-full border-2 border-slate-800 bg-slate-950 flex flex-col items-center justify-center hover:border-red-400/40 transition-all duration-500 shadow-xl group">
+                    <span id="promise-icon" class="text-4xl group-hover:scale-110 transition-transform">🤙</span>
+                    <span id="promise-btn-label" class="text-[9px] mt-2 text-slate-500 font-bold uppercase tracking-widest">Seal Vow</span>
+                </button>
+                
+                <p id="promise-status" class="text-xs text-red-400 font-serif italic mt-6 opacity-0 transition-opacity duration-1000">"Friends Forever. Strangers Never, Aamina."</p>
+            </div>
+
+            <button id="to-page-8-btn" class="bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold py-3.5 px-10 rounded-full shadow hover:scale-105 transition-all duration-300 cascade-item delay-200">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 8: KARAOKE & SONG LINES (PURE SILENT MODE) ================= -->
+        <section id="page-8" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-4 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Listen & Sing Along</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Kadhaippoma Lines</h1>
+            </header>
+
+            <div class="w-full bg-slate-900/50 backdrop-blur-md rounded-3xl p-6 shadow-2xl mb-6 border border-slate-800/80 relative cascade-item delay-100">
+                <button id="play-lyrics-btn" class="mb-6 mx-auto bg-gradient-to-r from-red-400 to-pink-500 text-slate-950 font-bold text-xs py-2.5 px-6 rounded-full flex items-center gap-2 transition-all shadow-lg">
+                    <span>▶</span> <span id="play-btn-text">Start Sing-Along</span>
+                </button>
+
+                <div id="lyrics-container" class="space-y-4 font-serif text-sm md:text-base tracking-wide text-slate-300">
+                    <p id="line-0" class="lyric-line opacity-25">"Noolarundha pattam polae..."</p>
+                    <p id="line-1" class="lyric-line opacity-25">"Unnai sutri naanum aada..."</p>
+                    <p id="line-2" class="lyric-line opacity-25">"Kaigal neeti neeyum pidikka kaathirukkiren..."</p>
+                    <p id="line-3" class="lyric-line opacity-25">"Kadhaippomaa... Nee pesa pesa kaayam aarumae..."</p>
+                </div>
+            </div>
+
+            <!-- Friendship Promise Highlight note -->
+            <div id="friendship-note" class="w-full bg-slate-900/40 border border-slate-800/60 rounded-2xl p-6 shadow-sm mb-8 transform transition-all duration-700 opacity-0 translate-y-2 cascade-item delay-200">
+                <p class="text-red-400 font-serif italic text-sm md:text-base leading-relaxed font-semibold">
+                    "I want this friendship to last for a long, long time. Please, let's never become strangers again."
+                </p>
+            </div>
+
+            <button id="to-page-9-btn" class="bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold py-3.5 px-10 rounded-full shadow hover:scale-105 transition-all duration-300 cascade-item delay-300">
+                Next Chapter
+            </button>
+        </section>
+
+        <!-- ================= PAGE 9: VIRTUAL BIRTHDAY CAKE ================= -->
+        <section id="page-9" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-6 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Interactive Blowout</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">Make A Wish, Aamina</h1>
+                <p class="text-slate-400 text-xs mt-1 font-light">Make a silent wish, then tap each candle's flame to blow it out.</p>
+            </header>
+
+            <div class="relative w-64 h-64 flex flex-col items-center justify-end mb-6 bg-slate-950/40 border border-slate-800/60 rounded-3xl p-4 shadow-inner cascade-item delay-100">
+                <!-- Candles on Top Tier -->
+                <div class="flex justify-center gap-6 mb-[-6px] z-20 relative">
+                    <!-- Candle 1 -->
+                    <div class="flex flex-col items-center relative">
+                        <div onclick="extinguishCandle(this, 1)" class="candle-flame text-xl cursor-pointer select-none filter drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]">🔥</div>
+                        <div class="w-2.5 h-10 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-sm"></div>
+                    </div>
+                    <!-- Candle 2 (Middle) -->
+                    <div class="flex flex-col items-center relative">
+                        <div onclick="extinguishCandle(this, 2)" class="candle-flame text-xl cursor-pointer select-none filter drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]">🔥</div>
+                        <div class="w-2.5 h-10 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-sm"></div>
+                    </div>
+                    <!-- Candle 3 -->
+                    <div class="flex flex-col items-center relative">
+                        <div onclick="extinguishCandle(this, 3)" class="candle-flame text-xl cursor-pointer select-none filter drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]">🔥</div>
+                        <div class="w-2.5 h-10 bg-gradient-to-b from-amber-300 to-amber-500 rounded-t-sm"></div>
+                    </div>
+                </div>
+
+                <!-- Birthday Cake Structure (Pure CSS) -->
+                <div class="w-full flex flex-col items-center z-10">
+                    <!-- Cake Top Tier -->
+                    <div class="w-32 h-14 bg-gradient-to-r from-rose-500 to-pink-500 rounded-t-md border-b-4 border-rose-600 relative flex items-center justify-center">
+                        <span class="text-[9px] uppercase tracking-widest text-white/70 font-semibold font-sans">Make a Wish</span>
+                        <!-- Frosted Drips -->
+                        <div class="absolute bottom-[-6px] left-0 right-0 flex justify-around">
+                            <div class="w-3 h-3 bg-pink-500 rounded-full"></div>
+                            <div class="w-3 h-4 bg-pink-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-pink-500 rounded-full"></div>
+                            <div class="w-3 h-4 bg-pink-500 rounded-full"></div>
+                        </div>
+                    </div>
+                    <!-- Cake Bottom Tier -->
+                    <div class="w-48 h-16 bg-gradient-to-r from-red-600 to-rose-600 rounded-t-sm border-b-4 border-red-700 relative">
+                        <!-- Whipped Cream Frosting circles -->
+                        <div class="absolute -top-2 left-0 right-0 flex justify-between px-2">
+                            <div class="w-3.5 h-3.5 bg-white/80 rounded-full shadow-sm"></div>
+                            <div class="w-3.5 h-3.5 bg-white/80 rounded-full shadow-sm"></div>
+                            <div class="w-3.5 h-3.5 bg-white/80 rounded-full shadow-sm"></div>
+                            <div class="w-3.5 h-3.5 bg-white/80 rounded-full shadow-sm"></div>
+                            <div class="w-3.5 h-3.5 bg-white/80 rounded-full shadow-sm"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p id="candle-status-msg" class="text-xs text-slate-400 mb-8 font-semibold tracking-wide cascade-item delay-200">Flames Blown Out: 0 / 3</p>
+
+            <button id="to-page-10-btn" class="opacity-50 pointer-events-none bg-slate-900 text-slate-600 border border-slate-800 font-bold py-3.5 px-10 rounded-full transition-all duration-300 cascade-item delay-300">
+                Continue
+            </button>
+        </section>
+
+        <!-- ================= PAGE 10: THE TIMELINE ================= -->
+        <section id="page-10" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-8 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Our Milestones</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">The Journey</h1>
+            </header>
+
+            <div class="relative border-l border-slate-800 ml-4 md:ml-6 space-y-8 text-left w-full max-w-md mb-10 cascade-item delay-100">
+                <div class="relative pl-8 group">
+                    <div class="absolute -left-[9px] top-1.5 bg-slate-950 border border-red-400 w-4 h-4 rounded-full group-hover:scale-125 transition-transform"></div>
+                    <span class="text-[9px] font-bold text-red-400 uppercase tracking-widest">Chapter One</span>
+                    <h3 class="text-sm font-serif font-bold text-white mt-0.5">The Introduction</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 font-light leading-relaxed">The unexpected moment when our paths crossed, setting this beautiful dynamic in motion.</p>
+                </div>
+                <div class="relative pl-8 group">
+                    <div class="absolute -left-[9px] top-1.5 bg-slate-950 border border-pink-400 w-4 h-4 rounded-full group-hover:scale-125 transition-transform"></div>
+                    <span class="text-[9px] font-bold text-pink-400 uppercase tracking-widest">Chapter Two</span>
+                    <h3 class="text-sm font-serif font-bold text-white mt-0.5">Growing Closer</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 font-light leading-relaxed">Late conversations, shared vulnerabilities, and realizing that we held a rare, precious bond.</p>
+                </div>
+                <div class="relative pl-8 group">
+                    <div class="absolute -left-[9px] top-1.5 bg-slate-950 border border-amber-400 w-4 h-4 rounded-full group-hover:scale-125 transition-transform"></div>
+                    <span class="text-[9px] font-bold text-amber-400 uppercase tracking-widest">Chapter Three</span>
+                    <h3 class="text-sm font-serif font-bold text-white mt-0.5">The Present</h3>
+                    <p class="text-slate-400 text-xs mt-1.5 font-light leading-relaxed">Standing right here today, celebrating you, with a promise to never drift apart.</p>
+                </div>
+            </div>
+
+            <button id="to-page-11-btn" class="bg-gradient-to-r from-red-500 to-rose-500 text-white font-bold py-3.5 px-10 rounded-full shadow hover:scale-105 transition-all duration-300 cascade-item delay-200">
+                Reveal the Surprise
+            </button>
+        </section>
+
+        <!-- ================= PAGE 11: SURPRISE BOX (LETTER FOR AAMINA) ================= -->
+        <section id="page-11" class="page-transition hidden w-full flex flex-col items-center text-center opacity-0 scale-95">
+            <header class="mb-8 cascade-item">
+                <span class="text-xs font-semibold tracking-widest text-red-400 uppercase bg-slate-900/60 border border-slate-800 px-3.5 py-1 rounded-full">Surprise Box</span>
+                <h1 class="text-3xl font-serif font-bold text-white mt-4">The Milestone</h1>
+                <p class="text-slate-400 text-xs mt-1">Tap the gift box below to reveal your birthday letter.</p>
+            </header>
+
+            <div id="gift-container" class="cursor-pointer group flex flex-col items-center mb-10 relative cascade-item delay-100">
+                <div id="gift-box" class="w-32 h-32 text-red-500 transition-transform duration-500 group-hover:scale-110 drop-shadow-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-full h-full">
+                        <path d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                    </svg>
+                </div>
+                <span id="gift-hint" class="text-xs text-red-500 mt-4 uppercase tracking-widest font-bold animate-pulse">Open Me</span>
+            </div>
+
+            <!-- Opened letter elements -->
+            <div id="surprise-wrapper" class="hidden w-full flex flex-col items-center space-y-8 opacity-0 transition-all duration-1000">
+                <!-- 3D Flipping Polaroids with Custom Hand-coded Friendship Vector Illustrations -->
+                <div class="flex flex-row justify-center gap-4 w-full max-w-md">
+                    <!-- Polaroid 1 -->
+                    <div class="polaroid-3d w-1/2 aspect-[3/4] cursor-pointer" onclick="flipPolaroid(this)">
+                        <div class="polaroid-inner w-full h-full relative">
+                            <!-- Front Side (Cartoon illustration 1: Sitting under stars) -->
+                            <div class="polaroid-front bg-slate-900 p-3 pb-8 rounded-lg shadow-2xl border border-slate-800/80 flex flex-col justify-between h-full">
+                                <div class="bg-red-950/40 w-full aspect-square flex items-center justify-center overflow-hidden rounded-md">
+                                    <svg class="w-full h-full p-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="100" height="100" rx="6" fill="#151726"/>
+                                        <circle cx="82" cy="22" r="3.5" fill="#fef08a" />
+                                        <circle cx="18" cy="35" r="1" fill="#ffffff" opacity="0.6"/>
+                                        <circle cx="38" cy="18" r="0.8" fill="#ffffff" opacity="0.8"/>
+                                        <path d="M0,90 Q50,78 100,90 L100,100 L0,100 Z" fill="#0b0f19" />
+                                        <g transform="translate(10, 0)">
+                                            <rect x="20" y="65" width="16" height="20" rx="3" fill="#dc2626" />
+                                            <rect x="25" y="58" width="6" height="8" fill="#fed7aa" />
+                                            <circle cx="28" cy="50" r="10" fill="#fed7aa" />
+                                            <path d="M16,48 C16,36 30,36 38,44 C40,46 36,40 28,40 C20,40 18,45 16,48 Z" fill="#1e293b" />
+                                            <path d="M25,52 Q28,55 31,52" stroke="#1e293b" stroke-width="1.2" stroke-linecap="round" />
+                                        </g>
+                                        <g transform="translate(-10, 0)">
+                                            <rect x="64" y="65" width="16" height="20" rx="3" fill="#fb7185" />
+                                            <rect x="69" y="58" width="6" height="8" fill="#fed7aa" />
+                                            <circle cx="72" cy="50" r="10" fill="#fed7aa" />
+                                            <path d="M60,52 C60,40 84,40 84,52" fill="#475569" />
+                                            <path d="M62,48 C62,38 82,38 82,48 C82,40 62,40 62,48 Z" fill="#475569" />
+                                            <circle cx="81" cy="49" r="2.5" fill="#ef4444" />
+                                            <path d="M69,52 Q72,55 75,52" stroke="#1e293b" stroke-width="1.2" stroke-linecap="round" />
+                                        </g>
+                                        <path d="M50,45 C48,43 45,43 45,45 C45,48 50,51 50,51 C50,51 55,48 55,45 C55,43 52,43 50,45 Z" fill="#ef4444" />
+                                    </svg>
+                                </div>
+                                <p class="text-center font-serif text-[10px] text-slate-500 italic mt-3">Shared Smiles</p>
+                            </div>
+                            <!-- Back Side -->
+                            <div class="polaroid-back bg-slate-900 p-4 rounded-lg shadow-2xl border border-rose-500/30 flex flex-col justify-center items-center h-full text-center">
+                                <span class="text-rose-400 text-lg mb-2">💫</span>
+                                <p class="font-serif text-[11px] text-slate-300 italic leading-relaxed font-sans">
+                                    "No matter the distance, our laughter always sounds exactly the same."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Polaroid 2 -->
+                    <div class="polaroid-3d w-1/2 aspect-[3/4] cursor-pointer" onclick="flipPolaroid(this)">
+                        <div class="polaroid-inner w-full h-full relative">
+                            <!-- Front Side (Cartoon illustration 2: Fist Bump of friendship) -->
+                            <div class="polaroid-front bg-slate-900 p-3 pb-8 rounded-lg shadow-2xl border border-slate-800/80 flex flex-col justify-between h-full">
+                                <div class="bg-red-950/40 w-full aspect-square flex items-center justify-center overflow-hidden rounded-md">
+                                    <svg class="w-full h-full p-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="100" height="100" rx="6" fill="#151726"/>
+                                        <g transform="translate(50, 42)">
+                                            <circle cx="0" cy="-22" r="1" fill="#fbbf24" />
+                                            <circle cx="-22" cy="0" r="1" fill="#f43f5e" />
+                                            <circle cx="22" cy="0" r="1" fill="#fbbf24" />
+                                            <circle cx="0" cy="22" r="1" fill="#f43f5e" />
+                                            <path d="M-4,-4 L0,-16 L4,-4 L16,0 L4,4 L0,16 L-4,4 L-16,0 Z" fill="#fef08a" opacity="0.8" transform="scale(0.55)" />
+                                        </g>
+                                        <g transform="translate(12, 38)">
+                                            <path d="M0,5 L20,10 L20,25 L0,20 Z" fill="#dc2626" />
+                                            <path d="M20,10 L34,12 L35,23 L20,25 Z" fill="#fed7aa" />
+                                            <circle cx="36" cy="17" r="6.5" fill="#fed7aa" />
+                                        </g>
+                                        <g transform="translate(88, 38) scale(-1, 1)">
+                                            <path d="M0,5 L20,10 L20,25 L0,20 Z" fill="#fb7185" />
+                                            <path d="M20,10 L34,12 L35,23 L20,25 Z" fill="#fed7aa" />
+                                            <circle cx="36" cy="17" r="6.5" fill="#fed7aa" />
+                                        </g>
+                                        <circle cx="50" cy="55" r="12" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 3" />
+                                    </svg>
+                                </div>
+                                <p class="text-center font-serif text-[10px] text-slate-500 italic mt-3">Through Everything</p>
+                            </div>
+                            <!-- Back Side -->
+                            <div class="polaroid-back bg-slate-900 p-4 rounded-lg shadow-2xl border border-rose-500/30 flex flex-col justify-center items-center h-full text-center">
+                                <span class="text-rose-400 text-lg mb-2">🎈</span>
+                                <p class="font-serif text-[11px] text-slate-300 italic leading-relaxed font-sans">
+                                    "We promised to never become strangers. This promise is for a lifetime, Aamina."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Scrollable Letter to Aamina -->
+                <div class="max-w-lg w-full bg-slate-900/60 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-slate-800/80 shadow-2xl text-left">
+                    <h2 class="text-2xl font-serif font-bold text-red-400 mb-4 text-center">To Aamina, Someone Priceless</h2>
+                    
+                    <div class="custom-scroll max-h-[300px] overflow-y-auto pr-2 space-y-4 text-slate-300 text-xs md:text-sm leading-relaxed font-light font-sans font-light">
+                        <p>Dearest Aamina,</p>
+                        
+                        <p>
+                            As the clock strikes twelve on this beautiful June 25th, my heart is filled with so much gratitude. I wanted to build this custom space specifically for you, to celebrate your existence and tell you how much you truly mean to me.
+                        </p>
+                        
+                        <p>
+                            Our friendship is one of the rarest, most beautiful chapters in my life. In a world where people constantly drift in and out, finding someone who genuinely understands, supports, and stays is nothing short of a miracle. Your kindness, your laughter, and your unyielding support have been a source of constant light.
+                        </p>
+
+                        <p>
+                            I remember when our paths first crossed and how naturally we grew closer over time. The late-night conversations, the shared jokes, and the comforting silences have carved out a safe space that I deeply cherish. There is a rare kind of warmth in knowing that no matter what life throws our way, there is an unspoken trust between us.
+                        </p>
+
+                        <p>
+                            I want to make a special promise to you on your birthday: through whatever storms or changes life brings, we will never become strangers again. Let us protect this bond, guard it against distance, and ensure it always stays as bright as it is today. You will always have a place of safety, warmth, and laughter in my life.
+                        </p>
+
+                        <p>
+                            Aamina, thank you for staying true to the incredible soul you are. I hope your birthday is filled with endless laughter, peace, and every single dream you wish to achieve. May this year ahead be your brightest one yet.
+                        </p>
+
+                        <p>Happy Birthday, Aamina!</p>
+                    </div>
+
+                    <div class="mt-6 flex justify-between items-center border-t border-slate-800 pt-4">
+                        <span class="text-rose-400 text-xl font-serif font-sans">🤍</span>
+                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider font-sans">— With Love, Me</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-6 text-center text-[10px] text-slate-600 tracking-widest font-semibold uppercase">
+        Made with 🤍  for you
+    </footer>
+
+    <!-- ================= PROMISE POPUP (DODGING NO BUTTON) ================= -->
+    <div id="popup-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-900 rounded-3xl p-6 md:p-8 max-w-sm w-full text-center shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-300 relative">
+            <div class="w-12 h-12 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-white">Do you promise, Aamina?</h3>
+            <p class="text-slate-400 text-sm mt-2 font-sans">Do you promise to protect this beautiful connection and always stay by my side?</p>
+            
+            <div class="mt-6 flex justify-center gap-4 relative min-h-[50px]">
+                <button id="modal-yes" class="bg-gradient-to-r from-red-500 to-rose-500 text-slate-950 font-bold py-2 px-6 rounded-xl text-sm transition-colors shadow-lg z-10 font-sans">
+                    Yes, I do
+                </button>
+                <button id="modal-no" class="bg-slate-800 text-slate-400 font-semibold py-2 px-6 rounded-xl text-sm border border-slate-700 shadow-sm select-none transition-all duration-100 z-20 font-sans">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= CONTROL LOGIC SCRIPT ================= -->
+    <script>
+        // ========================================================
+        // 1. CONFIGURATION
+        // ========================================================
+        
+        // Target Birthday (June 25, 2026 Midnight)
+        // Numeric instantiation is highly robust and avoids Date string crashes on Safari/mobile browsers
+        const TARGET_DATE = new Date(2026, 5, 25, 0, 0, 0).getTime(); // June is month index 5
+
+        // DEV PREVIEW MODE FLAG:
+        // Set to true  -> Bypasses countdown locks so you can instantly preview/test the pages.
+        // Set to false -> Locks are active. She cannot click continue until June 25th midnight!
+        const DEVELOPER_TEST_MODE = false; 
+
+        // ========================================================
+        // 2. DOM CONFIGURATION & DEFENSIVE QUERIES
+        // ========================================================
+        const bgMusic = document.getElementById("bg-music");
+        const bgMusicCountdown = document.getElementById("bg-music-countdown");
+        const musicWidget = document.getElementById("music-widget");
+        const musicToggle = document.getElementById("music-toggle");
+        const musicOnIcon = document.getElementById("music-on-icon");
+        const musicOffIcon = document.getElementById("music-off-icon");
+
+        const daysEl = document.getElementById("days");
+        const hoursEl = document.getElementById("hours");
+        const minutesEl = document.getElementById("minutes");
+        const secondsEl = document.getElementById("seconds");
+
+        const celebrationOverlay = document.getElementById("celebration-overlay");
+
+        const page1 = document.getElementById("page-1");
+        const page2 = document.getElementById("page-2");
+        const page3 = document.getElementById("page-3");
+        const page4 = document.getElementById("page-4");
+        const page5 = document.getElementById("page-5");
+        const page6 = document.getElementById("page-6");
+        const page7 = document.getElementById("page-7");
+        const page8 = document.getElementById("page-8");
+        const page9 = document.getElementById("page-9");
+        const page10 = document.getElementById("page-10");
+        const page11 = document.getElementById("page-11");
+        
+        const popupModal = document.getElementById("popup-modal");
+        const noBtn = document.getElementById("modal-no");
+        const testModeBadge = document.getElementById("test-mode-badge");
+        const lockedNotice = document.getElementById("locked-notice");
+        const toPage2Btn = document.getElementById("to-page-2-btn");
+
+        const soundPromptBtn = document.getElementById("sound-prompt-btn");
+        const soundPromptContainer = document.getElementById("sound-prompt-container");
+
+        let countdownActive = true;
+
+        function routeAppLockState() {
+            const now = new Date().getTime();
+            const timeDifference = TARGET_DATE - now;
+
+            if (DEVELOPER_TEST_MODE) {
+                if (testModeBadge) testModeBadge.classList.remove("hidden");
+                if (lockedNotice) lockedNotice.classList.add("hidden");
+                if (toPage2Btn) toPage2Btn.classList.remove("hidden");
+            } else {
+                if (testModeBadge) testModeBadge.classList.add("hidden");
+                if (timeDifference <= 0) {
+                    if (lockedNotice) lockedNotice.classList.add("hidden");
+                    if (toPage2Btn) toPage2Btn.classList.remove("hidden");
+                } else {
+                    if (lockedNotice) lockedNotice.classList.remove("hidden");
+                    if (toPage2Btn) toPage2Btn.classList.add("hidden");
+                }
+            }
+        }
+
+        // Defensive execution guard
+        routeAppLockState();
+
+        // Page 1 specific audio unblock click
+        if (soundPromptBtn) {
+            soundPromptBtn.addEventListener("click", () => {
+                if (bgMusicCountdown) {
+                    bgMusicCountdown.play().then(() => {
+                        soundPromptContainer.classList.add("hidden");
+                        if (musicWidget) musicWidget.classList.remove("hidden");
+                        if (musicOnIcon) musicOnIcon.classList.remove("hidden");
+                        if (musicOffIcon) musicOffIcon.classList.add("hidden");
+                    }).catch(e => console.log("Audio play prevented: ", e));
+                }
+            });
+        }
+
+        // 3. CLOCK LOGIC loop
+        const countdownTimer = setInterval(() => {
+            if (!countdownActive) return;
+
+            const now = new Date().getTime();
+            const difference = TARGET_DATE - now;
+
+            if (isNaN(difference) || difference <= 0) {
+                clearInterval(countdownTimer);
+                countdownActive = false;
+                
+                if (daysEl) daysEl.innerText = "00";
+                if (hoursEl) hoursEl.innerText = "00";
+                if (minutesEl) minutesEl.innerText = "00";
+                if (secondsEl) secondsEl.innerText = "00";
+
+                routeAppLockState();
+
+                if (!DEVELOPER_TEST_MODE) {
+                    triggerMidnightCelebration();
+                }
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            if (daysEl) daysEl.innerText = days.toString().padStart(2, '0');
+            if (hoursEl) hoursEl.innerText = hours.toString().padStart(2, '0');
+            if (minutesEl) minutesEl.innerText = minutes.toString().padStart(2, '0');
+            if (secondsEl) secondsEl.innerText = seconds.toString().padStart(2, '0');
+        }, 1000);
+
+        // Clue revealing transition
+        function revealClue(cardElement) {
+            // Is it unlocked? Unlocked if DEVELOPER_TEST_MODE is true OR the target date has passed.
+            const now = new Date().getTime();
+            const isUnlocked = DEVELOPER_TEST_MODE || (TARGET_DATE - now <= 0);
+            
+            if (!isUnlocked) {
+                // Shake the card or show a small alert/pulse to show it's locked!
+                cardElement.classList.add('animate-shake'); // add a little temporary CSS shake
+                setTimeout(() => cardElement.classList.remove('animate-shake'), 500);
+                return; // DO NOT OPEN!
+            }
+
+            const placeholder = cardElement.querySelector('.clue-placeholder');
+            const textElement = cardElement.querySelector('.clue-text');
+            if (placeholder && !placeholder.classList.contains('hidden')) {
+                placeholder.classList.add('opacity-0');
+                setTimeout(() => {
+                    placeholder.classList.add('hidden');
+                    textElement.classList.remove('hidden');
+                    textElement.offsetHeight;
+                    textElement.classList.remove('opacity-0');
+                    textElement.classList.add('opacity-100');
+                    cardElement.classList.add('bg-slate-900/90', 'border-red-500/25', 'scale-105');
+                }, 300);
+            }
+        }
+
+        // Flower Click Logic (Page 2)
+        let clickedPetalCount = 0;
+        function clickPetal(pathElement, qualityName) {
+            if (!pathElement.classList.contains('petal-active')) {
+                pathElement.classList.add('petal-active');
+                clickedPetalCount++;
+                const displaySpan = document.getElementById('petal-display')?.querySelector('span');
+                if (displaySpan) displaySpan.innerText = qualityName;
+                
+                const counterEl = document.getElementById('petal-counter');
+                if (counterEl) counterEl.innerText = `Revealed: ${clickedPetalCount} / 4 qualities`;
+
+                if (clickedPetalCount === 4) {
+                    const continueBtn = document.getElementById('to-page-3-btn');
+                    if (continueBtn) {
+                        continueBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-900', 'text-slate-600', 'border-slate-800');
+                        continueBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-rose-500', 'text-white', 'hover:scale-105');
+                    }
+                }
+            }
+        }
+
+        // Wishing Well Logic (Page 4)
+        let sentWishesCount = 0;
+        function revealWish(element, wishName) {
+            const icon = element.querySelector('.wish-icon');
+            const text = element.querySelector('.wish-text');
+            if (text && text.classList.contains('hidden')) {
+                if (icon) icon.classList.add('hidden');
+                text.classList.remove('hidden');
+                element.classList.add('bg-slate-900/95', 'border-red-500/20', 'scale-105');
+                sentWishesCount++;
+                
+                const counterEl = document.getElementById('wish-counter');
+                if (counterEl) counterEl.innerText = `Wishes Sent: ${sentWishesCount} / 4`;
+
+                if (sentWishesCount === 4) {
+                    const continueBtn = document.getElementById('to-page-5-btn');
+                    if (continueBtn) {
+                        continueBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-900', 'text-slate-600', 'border-slate-800');
+                        continueBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-rose-500', 'text-white', 'hover:scale-105');
+                    }
+                }
+            }
+        }
+
+        // Balloon Pop Logic (Page 5)
+        let poppedBalloons = 0;
+        let balloonWord = "";
+        function popBalloon(element, letter) {
+            if (!element.classList.contains('balloon-popped')) {
+                element.classList.add('balloon-popped');
+                poppedBalloons++;
+                balloonWord += letter;
+                
+                const wordEl = document.getElementById("balloon-word-assembly");
+                if (wordEl) wordEl.innerText = balloonWord;
+
+                if (poppedBalloons === 6) {
+                    const continueBtn = document.getElementById('to-page-6-btn');
+                    if (continueBtn) {
+                        continueBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-900', 'text-slate-600', 'border-slate-800');
+                        continueBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-rose-500', 'text-white', 'hover:scale-105');
+                    }
+                }
+            }
+        }
+
+        // Constellation Star Connect (Page 6)
+        let connectedStars = 0;
+        function connectStar(buttonElement, starId) {
+            if (!buttonElement.classList.contains('star-active')) {
+                buttonElement.classList.add('star-active', 'border-amber-400', 'shadow-[0_0_10px_rgba(245,158,11,0.5)]');
+                connectedStars++;
+
+                const statusEl = document.getElementById("star-status-msg");
+                const line1 = document.getElementById("star-line-1");
+                const line2 = document.getElementById("star-line-2");
+                const line3 = document.getElementById("star-line-3");
+
+                if (connectedStars === 1 && line1 && statusEl) {
+                    line1.style.strokeDashoffset = "0";
+                    statusEl.innerText = "Connect: 1 / 3 alignments";
+                } else if (connectedStars === 2 && line2 && statusEl) {
+                    line2.style.strokeDashoffset = "0";
+                    statusEl.innerText = "Connect: 2 / 3 alignments";
+                } else if (connectedStars === 3 && line3 && statusEl) {
+                    line3.style.strokeDashoffset = "0";
+                    statusEl.innerText = "Alignment Sealed!";
+                    
+                    setTimeout(() => {
+                        const heartEl = document.getElementById("constellation-heart");
+                        if (heartEl) {
+                            heartEl.classList.remove("opacity-0");
+                            heartEl.classList.add("opacity-100");
+                        }
+                        
+                        const continueBtn = document.getElementById('to-page-7-btn');
+                        if (continueBtn) {
+                            continueBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-900', 'text-slate-600', 'border-slate-800');
+                            continueBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-rose-500', 'text-white', 'hover:scale-105');
+                        }
+                    }, 1000);
+                }
+            }
+        }
+
+        // Pinky Promise Logic (Page 7)
+        const promiseSealBtn = document.getElementById("promise-seal-btn");
+        const promiseStatus = document.getElementById("promise-status");
+        if (promiseSealBtn) {
+            promiseSealBtn.addEventListener("click", () => {
+                promiseSealBtn.classList.add("border-red-500", "shadow-[0_0_20px_rgba(239,68,68,0.4)]", "scale-95");
+                const pIcon = document.getElementById("promise-icon");
+                const pLabel = document.getElementById("promise-btn-label");
+                if (pIcon) pIcon.innerText = "🤝";
+                if (pLabel) pLabel.innerText = "Sealed";
+                if (promiseStatus) promiseStatus.classList.remove("opacity-0");
+            });
+        }
+
+        // Candle Blowout Logic (Page 9)
+        let blownCandlesCount = 0;
+        function extinguishCandle(flameElement, candleId) {
+            if (!flameElement.classList.contains('opacity-0')) {
+                // Spawn a delicate rising smoke particle before removing flame
+                const candleParent = flameElement.parentElement;
+                if (candleParent) {
+                    const smoke = document.createElement('div');
+                    smoke.className = 'smoke-wisp w-2.5 h-6';
+                    smoke.style.top = flameElement.offsetTop + 'px';
+                    smoke.style.left = flameElement.offsetLeft + 4 + 'px';
+                    candleParent.appendChild(smoke);
+                    setTimeout(() => { smoke.remove(); }, 1000);
+                }
+
+                flameElement.style.opacity = '0';
+                flameElement.style.pointerEvents = 'none';
+                blownCandlesCount++;
+
+                const statusEl = document.getElementById("candle-status-msg");
+                if (statusEl) statusEl.innerText = `Flames Blown Out: ${blownCandlesCount} / 3`;
+
+                if (blownCandlesCount === 3) {
+                    setTimeout(() => {
+                        if (statusEl) statusEl.innerHTML = "✨ Your wish has been sent to the stars! ✨";
+                        const continueBtn = document.getElementById("to-page-10-btn");
+                        if (continueBtn) {
+                            continueBtn.classList.remove('opacity-50', 'pointer-events-none', 'bg-slate-900', 'text-slate-600', 'border-slate-800');
+                            continueBtn.classList.add('bg-gradient-to-r', 'from-red-500', 'to-rose-500', 'text-white', 'hover:scale-105');
+                        }
+                    }, 500);
+                }
+            }
+        }
+
+        // 3D Polaroid Flip Action (Page 11)
+        function flipPolaroid(containerElement) {
+            const inner = containerElement.querySelector('.polaroid-inner');
+            if (inner) {
+                inner.classList.toggle('polaroid-flipped');
+            }
+        }
+
+        // Progress bar updater
+        function updateProgress(pageId) {
+            const step = parseInt(pageId.replace('page-', ''));
+            if (!isNaN(step)) {
+                const progressEl = document.getElementById('global-progress');
+                if (progressEl) {
+                    progressEl.style.width = `${Math.min(100, Math.round((step / 11) * 100))}%`;
+                }
+            }
+        }
+
+        // Navigation Controller
+        function transitionPage(fromPage, toPage) {
+            if (fromPage && toPage) {
+                fromPage.classList.add("opacity-0", "scale-95");
+                setTimeout(() => {
+                    fromPage.classList.add("hidden");
+                    toPage.classList.remove("hidden");
+                    toPage.offsetHeight;
+                    toPage.classList.remove("opacity-0", "scale-95");
+                    
+                    // Update Progress Bar
+                    updateProgress(toPage.id);
+
+                    // --- PAUSE BGM WHEN ENTERING KARAOKE (PAGE 8) ---
+                    if (toPage.id === "page-8") {
+                        if (bgMusic) bgMusic.pause();
+                        if (musicOnIcon) musicOnIcon.classList.add("hidden");
+                        if (musicOffIcon) musicOffIcon.classList.remove("hidden");
+                    }
+
+                    // --- RESUME BGM WHEN LEAVING KARAOKE (PAGE 8) ---
+                    if (fromPage.id === "page-8") {
+                        if (bgMusic) {
+                            bgMusic.currentTime = 0; // Restart Kadhaippoma seamlessly
+                            bgMusic.play().then(() => {
+                                if (musicOnIcon) musicOnIcon.classList.remove("hidden");
+                                if (musicOffIcon) musicOffIcon.classList.add("hidden");
+                            }).catch(e => console.log("Audio resume blocked by browser policy"));
+                        }
+                    }
+
+                    // Trigger inner cascade animations sequentially
+                    const items = toPage.querySelectorAll('.cascade-item');
+                    items.forEach(item => {
+                        item.style.opacity = '1';
+                    });
+                }, 600);
+            }
+        }
+
+        function toggleModal(show) {
+            if (popupModal) {
+                if (show) {
+                    popupModal.classList.remove("hidden");
+                    setTimeout(() => {
+                        popupModal.classList.add("opacity-100");
+                        popupModal.querySelector('div')?.classList.remove("scale-95");
+                    }, 10);
+                } else {
+                    popupModal.classList.add("opacity-100");
+                    popupModal.querySelector('div')?.classList.add("scale-95");
+                    setTimeout(() => {
+                        popupModal.classList.add("hidden");
+                    }, 300);
+                }
+            }
+        }
+
+        document.getElementById("to-page-2-btn")?.addEventListener("click", () => {
+            toggleModal(true);
+        });
+
+        // Prank running button dodge
+        function dodgeNoButton() {
+            if (noBtn) {
+                const margin = 100;
+                const x = Math.floor(Math.random() * (window.innerWidth - noBtn.offsetWidth - margin)) + (margin / 2);
+                const y = Math.floor(Math.random() * (window.innerHeight - noBtn.offsetHeight - margin)) + (margin / 2);
+                noBtn.style.position = 'fixed';
+                noBtn.style.left = `${x}px`;
+                noBtn.style.top = `${y}px`;
+            }
+        }
+
+        if (noBtn) {
+            noBtn.addEventListener("mouseover", dodgeNoButton);
+            noBtn.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                dodgeNoButton();
+            });
+        }
+
+        // Modal Option Yes (Starts BGM & transitions to page 2)
+        document.getElementById("modal-yes")?.addEventListener("click", () => {
+            toggleModal(false);
+            
+            // stop/fade out countdown audio
+            if (bgMusicCountdown) {
+                bgMusicCountdown.pause();
+                bgMusicCountdown.currentTime = 0;
+            }
+
+            // Play background music (Kadhaippoma)
+            if (bgMusic) {
+                bgMusic.play().then(() => {
+                    if (musicWidget) musicWidget.classList.remove("hidden");
+                }).catch(() => {
+                    console.log("Audio gesture executed.");
+                });
+            }
+            transitionPage(page1, page2);
+        });
+
+        // Toggle Audio controls
+        if (musicToggle) {
+            musicToggle.addEventListener("click", () => {
+                // Determine which audio element is currently active based on navigation
+                const activeAudio = page1.classList.contains("hidden") ? bgMusic : bgMusicCountdown;
+                
+                if (activeAudio) {
+                    if (activeAudio.paused) {
+                        activeAudio.play();
+                        musicOnIcon?.classList.remove("hidden");
+                        musicOffIcon?.classList.add("hidden");
+                    } else {
+                        activeAudio.pause();
+                        musicOnIcon?.classList.add("hidden");
+                        musicOffIcon?.classList.remove("hidden");
+                    }
+                }
+            });
+        }
+
+        // Karaoke controller (Page 8 - PURE SILENT SING-ALONG MODE)
+        const playLyricsBtn = document.getElementById("play-lyrics-btn");
+        const friendshipNote = document.getElementById("friendship-note");
+        let lyricInterval;
+
+        if (playLyricsBtn) {
+            playLyricsBtn.addEventListener("click", () => {
+                playLyricsBtn.classList.add("opacity-50", "pointer-events-none");
+                const pText = document.getElementById("play-btn-text");
+                if (pText) pText.innerText = "Sing Along Mode Active...";
+                
+                // Do NOT play bgMusic here (keep it paused so she can sing in silence)
+                if (bgMusic) bgMusic.pause();
+
+                if (musicOnIcon) musicOnIcon.classList.add("hidden");
+                if (musicOffIcon) musicOffIcon.classList.remove("hidden");
+
+                const lines = document.querySelectorAll(".lyric-line");
+                let index = 0;
+
+                lines.forEach(line => {
+                    line.className = "lyric-line lyric-inactive";
+                });
+
+                function runHighlight() {
+                    if (index < lines.length) {
+                        if (index > 0) {
+                            lines[index - 1].className = "lyric-line lyric-inactive";
+                        }
+                        lines[index].className = "lyric-line lyric-active";
+                        index++;
+                    } else {
+                        clearInterval(lyricInterval);
+                        lines[lines.length - 1].className = "lyric-line lyric-inactive";
+                        if (pText) pText.innerText = "Completed ❤️";
+                        if (friendshipNote) friendshipNote.classList.remove("opacity-0", "translate-y-2");
+                    }
+                }
+
+                runHighlight();
+                lyricInterval = setInterval(runHighlight, 3500);
+            });
+        }
+
+        // Steps navigation routing triggers (Defensively guarded)
+        document.getElementById("to-page-3-btn")?.addEventListener("click", () => { transitionPage(page2, page3); });
+        document.getElementById("to-page-4-btn")?.addEventListener("click", () => { transitionPage(page3, page4); });
+        document.getElementById("to-page-5-btn")?.addEventListener("click", () => { transitionPage(page4, page5); });
+        document.getElementById("to-page-6-btn")?.addEventListener("click", () => { transitionPage(page5, page6); });
+        document.getElementById("to-page-7-btn")?.addEventListener("click", () => { transitionPage(page6, page7); });
+        document.getElementById("to-page-8-btn")?.addEventListener("click", () => { transitionPage(page6, page7); }); // Fallback navigation safeguard
+        document.getElementById("to-page-8-btn")?.addEventListener("click", () => { transitionPage(page7, page8); });
+        document.getElementById("to-page-9-btn")?.addEventListener("click", () => { transitionPage(page8, page9); });
+        document.getElementById("to-page-10-btn")?.addEventListener("click", () => { transitionPage(page9, page10); });
+        document.getElementById("to-page-11-btn")?.addEventListener("click", () => { transitionPage(page10, page11); });
+
+        // Opening the Gift Box
+        const giftContainer = document.getElementById("gift-container");
+        const surpriseWrapper = document.getElementById("surprise-wrapper");
+
+        if (giftContainer) {
+            giftContainer.addEventListener("click", () => {
+                giftContainer.classList.add("hidden");
+                
+                // Trigger Burst Animation exactly at the center of the gift box
+                triggerGiftBurst();
+
+                if (surpriseWrapper) {
+                    surpriseWrapper.classList.remove("hidden");
+                    setTimeout(() => {
+                        surpriseWrapper.classList.add("opacity-100");
+                        // Reset progress bar to full on completion screen
+                        const progressEl = document.getElementById('global-progress');
+                        if (progressEl) progressEl.style.width = "100%";
+                    }, 50);
+                }
+            });
+        }
+
+        // Midnight Transition overlay
+        function triggerMidnightCelebration() {
+            // Stop any active countdown audio
+            if (bgMusicCountdown) {
+                bgMusicCountdown.pause();
+                bgMusicCountdown.currentTime = 0;
+            }
+
+            page1?.classList.add("hidden");
+            page2?.classList.add("hidden");
+            page3?.classList.add("hidden");
+            page4?.classList.add("hidden");
+            page5?.classList.add("hidden");
+            page6?.classList.add("hidden");
+            page7?.classList.add("hidden");
+            page8?.classList.add("hidden");
+            page9?.classList.add("hidden");
+            page10?.classList.add("hidden");
+            page11?.classList.add("hidden");
+            if (popupModal) popupModal.classList.add("hidden");
+
+            if (celebrationOverlay) {
+                celebrationOverlay.classList.remove("hidden");
+                setTimeout(() => {
+                    celebrationOverlay.classList.add("opacity-100");
+                }, 50);
+            }
+
+            initFireworksEngine();
+        }
+
+        // Proceed from midnight fireworks overlay screen
+        document.getElementById("proceed-from-celebration")?.addEventListener("click", () => {
+            if (celebrationOverlay) {
+                celebrationOverlay.classList.add("opacity-0");
+                
+                // Play Kadhaippoma in the background immediately
+                if (bgMusic) {
+                    bgMusic.play().then(() => {
+                        if (musicWidget) musicWidget.classList.remove("hidden");
+                        if (musicOnIcon) musicOnIcon.classList.remove("hidden");
+                        if (musicOffIcon) musicOffIcon.classList.add("hidden");
+                    }).catch(e => console.log("BGM playback blocked by security"));
+                }
+
+                setTimeout(() => {
+                    celebrationOverlay.classList.add("hidden");
+                    // Land directly on final gift reveal page
+                    if (page11) {
+                        page11.classList.remove("hidden");
+                        page11.offsetHeight;
+                        page11.classList.remove("opacity-0", "scale-95");
+                        // Set progress bar to full
+                        const progressEl = document.getElementById('global-progress');
+                        if (progressEl) progressEl.style.width = "100%";
+                    }
+                }, 1000);
+            }
+        });
+
+        // Ambient Floating Aurora Particles (Hearts & Stars)
+        const particlesContainer = document.getElementById("particles-container");
+        const particleIcons = ['❤️', '💖', '⭐', '✨', '🌹'];
+        if (particlesContainer) {
+            for (let i = 0; i < 35; i++) {
+                const particle = document.createElement("div");
+                particle.classList.add("particle");
+                particle.innerText = particleIcons[Math.floor(Math.random() * particleIcons.length)];
+                particle.style.fontSize = Math.random() * 15 + 8 + "px";
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.top = Math.random() * 100 + "vh";
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.animationDuration = Math.random() * 4 + 6 + "s";
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Canvas Fireworks Engine (Ruby Glow Explosions)
+        function initFireworksEngine() {
+            const canvas = document.getElementById("fireworks-canvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+
+            class FireworkParticle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.radius = Math.random() * 3 + 1;
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 8,
+                        y: (Math.random() - 0.5) * 8
+                    };
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.015 + 0.015;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                update() {
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                    this.alpha -= this.decay;
+                }
+            }
+
+            const colors = ["#ef4444", "#f43f5e", "#ec4899", "#f59e0b", "#fb7185"];
+
+            function spawnExplosion() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height * 0.6);
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                for (let i = 0; i < 40; i++) {
+                    particles.push(new FireworkParticle(x, y, color));
+                }
+            }
+
+            let intervalId = setInterval(spawnExplosion, 1500);
+
+            function animateFireworks() {
+                if (celebrationOverlay && !celebrationOverlay.classList.contains("hidden")) {
+                    requestAnimationFrame(animateFireworks);
+                } else {
+                    clearInterval(intervalId);
+                }
+
+                ctx.fillStyle = "rgba(11, 2, 4, 0.2)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach((particle, index) => {
+                    if (particle.alpha <= 0) {
+                        particles.splice(index, 1);
+                    } else {
+                        particle.update();
+                        particle.draw();
+                    }
+                });
+            }
+
+            animateFireworks();
+            spawnExplosion();
+            setTimeout(spawnExplosion, 400);
+            setTimeout(spawnExplosion, 800);
+        }
+
+        // ========================================================
+        // 4. INTERACTIVE TAP SPARKLE CANVAS TRAIL & BURST ENGINE
+        // ========================================================
+        const sparkleCanvas = document.getElementById("magic-sparkle-canvas");
+        let TouchSparkle;
+        let sparkles = [];
+
+        if (sparkleCanvas) {
+            const sCtx = sparkleCanvas.getContext("2d");
+
+            function resizeSparkleCanvas() {
+                sparkleCanvas.width = window.innerWidth;
+                sparkleCanvas.height = window.innerHeight;
+            }
+            window.addEventListener("resize", resizeSparkleCanvas);
+            resizeSparkleCanvas();
+
+            TouchSparkle = class {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = Math.random() * 8 + 3;
+                    this.speedX = (Math.random() - 0.5) * 4;
+                    this.speedY = (Math.random() - 0.5) * 4 - 1; // drift upward slightly
+                    this.alpha = 1;
+                    this.decay = Math.random() * 0.02 + 0.015;
+                    this.isHeart = Math.random() > 0.6; // some are hearts, some are stars
+                    this.color = this.isHeart ? "#f43f5e" : "#fbbf24";
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.alpha -= this.decay;
+                }
+
+                draw() {
+                    sCtx.save();
+                    sCtx.globalAlpha = this.alpha;
+                    sCtx.fillStyle = this.color;
+                    
+                    if (this.isHeart) {
+                        sCtx.beginPath();
+                        sCtx.moveTo(this.x, this.y);
+                        sCtx.bezierCurveTo(this.x - this.size / 2, this.y - this.size / 2, this.x - this.size, this.y + this.size / 3, this.x, this.y + this.size);
+                        sCtx.bezierCurveTo(this.x + this.size, this.y + this.size / 3, this.x + this.size / 2, this.y - this.size / 2, this.x, this.y);
+                        sCtx.fill();
+                    } else {
+                        sCtx.beginPath();
+                        sCtx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                        sCtx.fill();
+                    }
+                    sCtx.restore();
+                }
+            };
+
+            function handleInteraction(x, y) {
+                for (let i = 0; i < 6; i++) {
+                    sparkles.push(new TouchSparkle(x, y));
+                }
+            }
+
+            // Bind click & mobile touch points
+            window.addEventListener("click", (e) => {
+                handleInteraction(e.clientX, e.clientY);
+            });
+            window.addEventListener("touchmove", (e) => {
+                if (e.touches.length > 0) {
+                    handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            function animateSparkles() {
+                requestAnimationFrame(animateSparkles);
+                sCtx.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
+                sparkles.forEach((sparkle, idx) => {
+                    if (sparkle.alpha <= 0) {
+                        sparkles.splice(idx, 1);
+                    } else {
+                        sparkle.update();
+                        sparkle.draw();
+                    }
+                });
+            }
+            animateSparkles();
+        }
+
+        // Interactive Gift Box Burst explosion
+        function triggerGiftBurst() {
+            const giftBox = document.getElementById("gift-box");
+            if (!giftBox || !TouchSparkle) return;
+            const rect = giftBox.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 60; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 8 + 4;
+                const sparkle = new TouchSparkle(x, y);
+                sparkle.speedX = Math.cos(angle) * velocity;
+                sparkle.speedY = Math.sin(angle) * velocity - 2; // blast upwards
+                sparkle.size = Math.random() * 12 + 6; // slightly larger particles for the blast
+                sparkle.decay = Math.random() * 0.01 + 0.01; // fade out slightly slower
+                sparkles.push(sparkle);
+            }
+        }
+    </script>
+</body>
+</html>
