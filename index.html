@@ -211,17 +211,12 @@
     <!-- Floating Ruby Hearts & Warm Stars -->
     <div id="particles-container" class="absolute inset-0 pointer-events-none overflow-hidden z-0"></div>
 
-    <!-- Background Audio for Countdown -->
-<audio id="bg-music-countdown"
-       src="./assets/audio/teddy_en_nanbiye.mp3"
-       loop>
-</audio>
+    <!-- Background Audio for Countdown Page (Page 1) -->
+    <audio id="bg-music-countdown" src="teddy_en_nanbiye.mp3" loop></audio>
 
-<!-- Background Audio for Main Experience -->
-<audio id="bg-music"
-       src="./assets/audio/Kadhaippoma.mp3"
-       loop>
-</audio>
+    <!-- Background Audio for Main Experience (Kadhaippoma) -->
+    <audio id="bg-music" src="Kadhaippoma.mp3" loop></audio>
+
     <!-- Floating Audio Control Widget -->
     <div id="music-widget" class="fixed top-4 right-4 z-50 hidden">
         <button id="music-toggle" class="bg-slate-900/90 backdrop-blur-md border border-slate-800 p-3 rounded-full shadow-2xl text-red-500 hover:scale-115 transition-all focus:outline-none">
@@ -803,7 +798,7 @@
                     </div>
 
                     <div class="mt-6 flex justify-between items-center border-t border-slate-800 pt-4">
-                        <span class="text-rose-400 text-xl font-serif font-sans">🤍</span>
+                        <span class="text-rose-400 text-xl font-serif font-sans">❤️</span>
                         <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider font-sans">— With Love, Me</span>
                     </div>
                 </div>
@@ -814,7 +809,7 @@
 
     <!-- Footer -->
     <footer class="relative z-10 py-6 text-center text-[10px] text-slate-600 tracking-widest font-semibold uppercase">
-        Made with 🤍  for you
+        Made with ❤️ for you
     </footer>
 
     <!-- ================= PROMISE POPUP (DODGING NO BUTTON) ================= -->
@@ -852,7 +847,7 @@
         // DEV PREVIEW MODE FLAG:
         // Set to true  -> Bypasses countdown locks so you can instantly preview/test the pages.
         // Set to false -> Locks are active. She cannot click continue until June 25th midnight!
-        const DEVELOPER_TEST_MODE = false; 
+        const DEVELOPER_TEST_MODE = true; 
 
         // ========================================================
         // 2. DOM CONFIGURATION & DEFENSIVE QUERIES
